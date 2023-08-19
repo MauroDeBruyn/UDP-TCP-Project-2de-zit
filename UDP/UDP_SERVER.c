@@ -133,6 +133,19 @@ void execution( int internet_socket )
 	socklen_t client_internet_address_length = sizeof client_internet_address;
 	number_of_bytes_received = recvfrom( internet_socket, buffer, ( sizeof buffer ) - 1, 0, (struct sockaddr *) &client_internet_address, &client_internet_address_length );
 
+	//When no bytes are received, set number_of_bytes_received = -1 using time_out
+	unsigned long time_out = 3000; //defines the time_out time in ms
+	setsockopt(internet_socket, SOL_SOCKET, SO_RCVTIMEO, (const char*)&time_out, sizeof time_out);
+
+	//send random integers
+	int randomInt = 0;
+	char sendCharConversion[1000];
+	int number_of_bytes_send = 0;
+	int numberOfInt = 0;
+
+	srand(time(0));//time(0) to create a random seed using the current time
+	numberOfInt = (rand() % 42) + 1;//declares the max limit of operations send
+
 	//receive 'GO' from client
 	if( number_of_bytes_received == -1 )
 	{
@@ -144,14 +157,8 @@ void execution( int internet_socket )
 		printf( "Received : %s\n", buffer );
 	}
 
-	//send random integers
-	srand(time(0));//time(0) to create a random seed using the current time
 
-	int randomInt = 0;
-	char sendCharConversion[1000];
-	int number_of_bytes_send = 0;
-
-	for(int i = 0; i <= 8; i++)
+	for(int x = 0; x <= numberOfInt; x++)
 	{
 		number_of_bytes_send = 0;
 		randomInt = rand() % 100 + 1;
@@ -178,7 +185,7 @@ void execution( int internet_socket )
 
 
 		//Second set of random integers
-		for(int i = 0; i <= 8; i++)
+		for(int x = 0; x <= numberOfInt; x++)
 		{
 			number_of_bytes_send = 0;
 			randomInt = rand() % 100 + 1;
