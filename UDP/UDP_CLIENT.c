@@ -154,7 +154,11 @@ void execution( int internet_socket, struct sockaddr * internet_address, socklen
 
 	//send highestInt to server
 	number_of_bytes_send = 0;
-	number_of_bytes_send = sendto( internet_socket, "highestInt", 16, 0, internet_address, internet_address_length );
+	char sendHighestInt[1000];
+
+	sprintf(sendHighestInt, "%d", highestInt);
+
+	number_of_bytes_send = sendto( internet_socket, sendHighestInt, 16, 0, internet_address, internet_address_length );
 	if( number_of_bytes_send == -1 )
 	{
 		perror( "sendto" );
@@ -193,7 +197,9 @@ void execution( int internet_socket, struct sockaddr * internet_address, socklen
 
 	//send highestInt to server (second batch)
 	number_of_bytes_send = 0;
-	number_of_bytes_send = sendto( internet_socket, "highestInt", 16, 0, internet_address, internet_address_length );
+	sprintf(sendHighestInt, "%d", highestInt);
+
+	number_of_bytes_send = sendto( internet_socket, sendHighestInt, 16, 0, internet_address, internet_address_length );
 	if( number_of_bytes_send == -1 )
 	{
 		perror( "sendto" );

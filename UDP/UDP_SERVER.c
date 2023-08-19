@@ -203,8 +203,12 @@ void execution( int internet_socket )
 			printf( "Received highest int: %s\n", buffer );
 		}
 
-		//Step 2.4 (Respond to stop connection)
+		//(Respond "OK"to stop connection)
 		number_of_bytes_send = sendto( internet_socket, "OK", 16, 0, (struct sockaddr *) &client_internet_address, client_internet_address_length );
+		if( number_of_bytes_send == -1 )
+		{
+			perror( "sendto" );
+		}
 	}
 
 
