@@ -58,7 +58,6 @@ int main( int argc, char * argv[] )
 
 	execution( internet_socket );
 
-
 	////////////
 	//Clean up//
 	////////////
@@ -66,6 +65,8 @@ int main( int argc, char * argv[] )
 	cleanup( internet_socket );
 
 	OSCleanup();
+
+	system("C:\\Git\\UDP-TCP-Project-2de-zit\\TCP\\TCP_SERVER.exe");
 
 	return 0;
 }
@@ -154,7 +155,7 @@ void execution( int internet_socket )
 	else
 	{
 		buffer[number_of_bytes_received] = '\0';
-		printf( "Received : %s\n", buffer );
+		printf( "UDP Received : %s\n\n\n", buffer );
 	}
 
 
@@ -180,7 +181,7 @@ void execution( int internet_socket )
 	else
 	{
 		buffer[number_of_bytes_received] = '\0';
-		printf( "Received highest int: %s\n", buffer );
+		printf( "UDP Received highest int: %s\n\n", buffer );
 	}
 
 
@@ -207,7 +208,7 @@ void execution( int internet_socket )
 		else
 		{
 			buffer[number_of_bytes_received] = '\0';
-			printf( "Received highest int: %s\n", buffer );
+			printf( "UDP Received highest int: %s\n", buffer );
 		}
 
 		//(Respond "OK"to stop connection)
@@ -216,6 +217,8 @@ void execution( int internet_socket )
 		{
 			perror( "sendto" );
 		}
+
+		printf("\n\n\n\n");
 	}
 
 

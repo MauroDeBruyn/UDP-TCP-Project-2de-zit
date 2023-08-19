@@ -67,6 +67,8 @@ int main( int argc, char * argv[] )
 
 	OSCleanup();
 
+	system("C:\\Git\\UDP-TCP-Project-2de-zit\\TCP\\TCP_CLIENT.exe");
+
 	return 0;
 }
 
@@ -136,7 +138,7 @@ void execution( int internet_socket, struct sockaddr * internet_address, socklen
 		else
 		{
 			buffer[number_of_bytes_received] = '\0';
-			printf( "Received : %s\n", buffer );
+			printf( "UPD Received : %s\n", buffer );
 			sscanf(buffer, "%d", &receivedInt);//save received int from buffer in receivedInt value
 
 			if(receivedInt > highestInt)
@@ -150,7 +152,7 @@ void execution( int internet_socket, struct sockaddr * internet_address, socklen
 			}
 		}
 	}
-	printf("Highest int received: %d\n", highestInt);
+	printf("\n\nUPD Highest int received: %d\n\n", highestInt);
 
 	//send highestInt to server
 	number_of_bytes_send = 0;
@@ -179,7 +181,7 @@ void execution( int internet_socket, struct sockaddr * internet_address, socklen
 		else
 		{
 			buffer[number_of_bytes_received] = '\0';
-			printf( "Received : %s\n", buffer );
+			printf( "UPD Received : %s\n", buffer );
 			sscanf(buffer, "%d", &receivedInt);//save received int from buffer in receivedInt value
 
 			if(receivedInt > highestInt)
@@ -189,11 +191,11 @@ void execution( int internet_socket, struct sockaddr * internet_address, socklen
 
 			else if(receivedInt < 0)
 			{
-				printf("ERROR: Something went wrong, received int has a negative value");
+				printf("UPD ERROR: Something went wrong, received int has a negative value");
 			}
 		}
 	}
-	printf("Highest int received: %d\n", highestInt);
+	printf("\n\nUPD Highest int received: %d\n", highestInt);
 
 	//send highestInt to server (second batch)
 	number_of_bytes_send = 0;
@@ -216,8 +218,10 @@ void execution( int internet_socket, struct sockaddr * internet_address, socklen
 	else
 	{
 		buffer[number_of_bytes_received] = '\0';
-		printf( "Close connection: %s\n", buffer );
+		printf( "UPD Close connection: %s\n", buffer );
 	}
+
+	printf("\n\n\n\n");
 }
 
 void cleanup( int internet_socket, struct sockaddr * internet_address )

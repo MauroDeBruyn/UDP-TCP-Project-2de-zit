@@ -63,7 +63,6 @@ int main( int argc, char * argv[] )
 
 	execution( client_internet_socket );
 
-
 	////////////
 	//Clean up//
 	////////////
@@ -181,7 +180,7 @@ void execution( int internet_socket )
 
 			if(strcmp (buffer,"STOP") == 0)//if stop is received
 			{
-				printf("\n\nReceived: %s\n", buffer);//print stop buffer
+				printf("\n\nTCP Received: %s\n", buffer);//print stop buffer
 
 				//send "OK" to close connection
 				number_of_bytes_send = 0;
@@ -201,14 +200,14 @@ void execution( int internet_socket )
 				else
 				{
 					buffer[number_of_bytes_received] = '\0';
-					printf( "Received: %s\n", buffer );
+					printf( "TCP Received: %s\n", buffer );
 				}
 				return;//to exit all loops
 			}
 
 			else
 			{
-				printf( "Received operation %d: %s\n", i, buffer );
+				printf( "TCP Received operation %d: %s\n", i, buffer );
 			}
 		}
 
