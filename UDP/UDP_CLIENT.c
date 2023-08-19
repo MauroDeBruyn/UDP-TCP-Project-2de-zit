@@ -78,7 +78,7 @@ int initialization( struct sockaddr ** internet_address, socklen_t * internet_ad
 	memset( &internet_address_setup, 0, sizeof internet_address_setup );
 	internet_address_setup.ai_family = AF_UNSPEC;
 	internet_address_setup.ai_socktype = SOCK_DGRAM;
-	int getaddrinfo_return = getaddrinfo( "::1", "24042", &internet_address_setup, &internet_address_result );
+	int getaddrinfo_return = getaddrinfo( "::1", "24044", &internet_address_setup, &internet_address_result );
 	if( getaddrinfo_return != 0 )
 	{
 		fprintf( stderr, "getaddrinfo: %s\n", gai_strerror( getaddrinfo_return ) );
@@ -107,26 +107,47 @@ int initialization( struct sockaddr ** internet_address, socklen_t * internet_ad
 
 void execution( int internet_socket, struct sockaddr * internet_address, socklen_t internet_address_length )
 {
-	//Step 2.1
+	//Send "GO"
 	int number_of_bytes_send = 0;
-	number_of_bytes_send = sendto( internet_socket, "Hello UDP world!", 16, 0, internet_address, internet_address_length );
+	number_of_bytes_send = sendto( internet_socket, "GO", 16, 0, internet_address, internet_address_length );
 	if( number_of_bytes_send == -1 )
 	{
 		perror( "sendto" );
 	}
 
-	//Step 2.2
+	//Receive integer and filter highest value
 	int number_of_bytes_received = 0;
 	char buffer[1000];
-	number_of_bytes_received = recvfrom( internet_socket, buffer, ( sizeof buffer ) - 1, 0, internet_address, &internet_address_length );
-	if( number_of_bytes_received == -1 )
+	int receivedInt = 0;
+	int highestInt = 0;
+
+	//When no bytes are received, set number_of_bytes_received = -1
+	
+
+	while(number_of_bytes_received != -1) //if bytes are received
 	{
-		perror( "recvfrom" );
-	}
-	else
-	{
-		buffer[number_of_bytes_received] = '\0';
-		printf( "Received : %s\n", buffer );
+		number_of_bytes_received = recvfrom( internet_socket, buffer, ( sizeof buffer ) - 1, 0, internet_address, &internet_address_length );
+		if( number_of_bytes_received == -1 )
+		{
+			perror( "recvfrom" );
+		}
+		else
+		{
+			buffer[number_of_bytes_received] = '\0';
+			printf( "Received : %s\n", buffer );
+			sscanf(buffer, "%d", &receivedInt);//save received int from buffer in receivedInt value
+
+			if(receivedInt > highestInt)
+			{
+				highestInt = receivedInt;
+			}
+
+			else if(receivedInt < 0)
+			{
+				printf("ERROR: Something went wrong, received int has a negative value");
+			}
+		}
+		printf("Highest int received: %d\n", highestInt);
 	}
 }
 
