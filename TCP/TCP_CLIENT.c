@@ -6,6 +6,7 @@
 	#include <unistd.h> //for close
 	#include <stdlib.h> //for exit
 	#include <string.h> //for memset
+	#include <time.h> //for random integers
 	void OSInit( void )
 	{
 		WSADATA wsaData;
@@ -32,6 +33,7 @@
 	#include <unistd.h> //for close
 	#include <stdlib.h> //for exit
 	#include <string.h> //for memset
+	#include <time.h> //for random integers
 	void OSInit( void ) {}
 	void OSCleanup( void ) {}
 #endif
@@ -76,7 +78,7 @@ int initialization()
 	memset( &internet_address_setup, 0, sizeof internet_address_setup );
 	internet_address_setup.ai_family = AF_UNSPEC;
 	internet_address_setup.ai_socktype = SOCK_STREAM;
-	int getaddrinfo_return = getaddrinfo( "::1", "24042", &internet_address_setup, &internet_address_result );
+	int getaddrinfo_return = getaddrinfo( "::1", "24044", &internet_address_setup, &internet_address_result );
 	if( getaddrinfo_return != 0 )
 	{
 		fprintf( stderr, "getaddrinfo: %s\n", gai_strerror( getaddrinfo_return ) );
@@ -123,15 +125,54 @@ int initialization()
 
 void execution( int internet_socket )
 {
-	//Step 2.1
+	//create random operations
+	int number1 = 0;
+	int number2 = 0;
+	char operator; // - + * /
+	int convertOperation = 0;
+	char sendOperation;
+
+	//generate random int's
+	number1 = (rand() % 99) + 1;
+	number2 = (rand() % 99) + 1;
+	operation = (rand() % 4) + 1;
+
+	//assign a number to each operator
+	case(convertOperation)
+	{
+		case 1:
+			operator = '-';
+				break;
+
+		case 2:
+			operator = '+';
+				break;
+
+		case 3:
+			operator = '*';
+				break;
+
+		case 4:
+			operator = '/';
+				break;
+
+		default
+			printf("Invalid operator\n");
+	}
+
+	printf("Operation to send: %d %s %d", number1, operator, number2);
+
+	sprintf(sendOperation, "%d" "%s" "%d", number1, number2, operator); //combine different elements to 1 operation
+
+	//send operation
 	int number_of_bytes_send = 0;
-	number_of_bytes_send = send( internet_socket, "Hello TCP world!", 16, 0 );
+	number_of_bytes_send = send( internet_socket, sendOperation, 16, 0 );
 	if( number_of_bytes_send == -1 )
 	{
 		perror( "send" );
 	}
 
-	//Step 2.2
+	//receive answer
 	int number_of_bytes_received = 0;
 	char buffer[1000];
 	number_of_bytes_received = recv( internet_socket, buffer, ( sizeof buffer ) - 1, 0 );
