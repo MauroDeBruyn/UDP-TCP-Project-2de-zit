@@ -156,7 +156,14 @@ int connection( int internet_socket )
 
 void execution( int internet_socket )
 {
-	//Step 3.1
+	int number1 = 0;
+	int number2 = 0;
+	char operator;
+	int result = 0;
+	char sendResult[1000];
+
+
+	//receive operation
 	int number_of_bytes_received = 0;
 	char buffer[1000];
 	number_of_bytes_received = recv( internet_socket, buffer, ( sizeof buffer ) - 1, 0 );
@@ -167,12 +174,37 @@ void execution( int internet_socket )
 	else
 	{
 		buffer[number_of_bytes_received] = '\0';
-		printf( "Received : %s\n", buffer );
+		printf( "Received operation : %s\n", buffer );
 	}
 
-	//Step 3.2
+	sscanf(buffer, "%d %c %d", &number1, &operator, &number2); //save received data
+
+	switch (operator)
+	{
+		case '-':
+			result = number1 - number2;
+				break;
+
+		case '+':
+			result = number1 + number2;
+				break;
+
+		case '*':
+			result = number1 * number2;
+				break;
+
+		case '/':
+			result = number1 / number2;
+				break;
+
+		default:
+			printf("Invalid operator\n");
+	}
+
+	sprintf(sendResult, "%d", result); //convert result to send
+
 	int number_of_bytes_send = 0;
-	number_of_bytes_send = send( internet_socket, "Hello TCP world!", 16, 0 );
+	number_of_bytes_send = send( internet_socket, sendResult, 16, 0 );
 	if( number_of_bytes_send == -1 )
 	{
 		perror( "send" );

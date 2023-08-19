@@ -78,7 +78,7 @@ int initialization()
 	memset( &internet_address_setup, 0, sizeof internet_address_setup );
 	internet_address_setup.ai_family = AF_UNSPEC;
 	internet_address_setup.ai_socktype = SOCK_STREAM;
-	int getaddrinfo_return = getaddrinfo( "::1", "24044", &internet_address_setup, &internet_address_result );
+	int getaddrinfo_return = getaddrinfo( "::1", "24042", &internet_address_setup, &internet_address_result );
 	if( getaddrinfo_return != 0 )
 	{
 		fprintf( stderr, "getaddrinfo: %s\n", gai_strerror( getaddrinfo_return ) );
@@ -130,15 +130,16 @@ void execution( int internet_socket )
 	int number2 = 0;
 	char operator; // - + * /
 	int convertOperation = 0;
-	char sendOperation;
+	char sendOperation[1000];
+	srand(time(0));
 
 	//generate random int's
 	number1 = (rand() % 99) + 1;
 	number2 = (rand() % 99) + 1;
-	operation = (rand() % 4) + 1;
+	convertOperation = (rand() % 4) + 1;
 
 	//assign a number to each operator
-	case(convertOperation)
+	switch(convertOperation)
 	{
 		case 1:
 			operator = '-';
@@ -156,13 +157,12 @@ void execution( int internet_socket )
 			operator = '/';
 				break;
 
-		default
+		default:
 			printf("Invalid operator\n");
 	}
 
-	printf("Operation to send: %d %s %d", number1, operator, number2);
 
-	sprintf(sendOperation, "%d" "%s" "%d", number1, number2, operator); //combine different elements to 1 operation
+	sprintf(sendOperation, "%d %c %d", number1, operator, number2); //combine different elements to 1 operation
 
 	//send operation
 	int number_of_bytes_send = 0;
