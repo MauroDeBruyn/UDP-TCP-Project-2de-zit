@@ -134,8 +134,10 @@ void execution( int internet_socket )
 	srand(time(0));
 	int number_of_bytes_send = 0;
 	int number_of_bytes_received = 0;
+	int numberOfOperations = 0;
+	numberOfOperations = (rand() % 99) + 1;//declares the max limit of operations send
 
-	for(int i = 1; i < 5; i++)
+	for(int i = 1; i < numberOfOperations; i++)
 	{
 		//generate random int's
 		number1 = (rand() % 99) + 1;
