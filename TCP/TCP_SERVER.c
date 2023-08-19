@@ -162,10 +162,11 @@ void execution( int internet_socket )
 	int result = 0;
 	char sendResult[1000];
 	int number_of_bytes_received = 0;
-	char buffer[1000];
+	char buffer[1000] = "A";
 	int number_of_bytes_send = 0;
+	int i = 0;
 
-	for(int i = 1; i < 5; i++)
+	while(1)
 	{
 		//receive operation
 		number_of_bytes_received = 0;
@@ -177,7 +178,38 @@ void execution( int internet_socket )
 		else
 		{
 			buffer[number_of_bytes_received] = '\0';
-			printf( "Received operation %d: %s\n", i, buffer );
+
+			if(strcmp (buffer,"STOP") == 0)//if stop is received
+			{
+				printf("\n\nReceived: %s\n", buffer);//print stop buffer
+
+				//send "OK" to close connection
+				number_of_bytes_send = 0;
+				number_of_bytes_send = send( internet_socket, "OK", 16, 0 );
+				if( number_of_bytes_send == -1 )
+				{
+					perror( "send" );
+				}
+
+				//receive "KTNXBYE"
+				number_of_bytes_received = 0;
+				number_of_bytes_received = recv( internet_socket, buffer, ( sizeof buffer ) - 1, 0 );
+				if( number_of_bytes_received == -1 )
+				{
+					perror( "recv" );
+				}
+				else
+				{
+					buffer[number_of_bytes_received] = '\0';
+					printf( "Received: %s\n", buffer );
+				}
+				return;//to exit all loops
+			}
+
+			else
+			{
+				printf( "Received operation %d: %s\n", i, buffer );
+			}
 		}
 
 		sscanf(buffer, "%d %c %d", &number1, &operator, &number2); //save received data
@@ -212,7 +244,10 @@ void execution( int internet_socket )
 		{
 			perror( "send" );
 		}
+		i++;
 	}
+
+
 }
 
 void cleanup( int internet_socket, int client_internet_socket )

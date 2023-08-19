@@ -136,6 +136,7 @@ void execution( int internet_socket )
 	int number_of_bytes_received = 0;
 	int numberOfOperations = 0;
 	numberOfOperations = (rand() % 99) + 1;//declares the max limit of operations send
+	char buffer[1000];
 
 	for(int i = 1; i < numberOfOperations; i++)
 	{
@@ -180,7 +181,6 @@ void execution( int internet_socket )
 		}
 
 		//receive answer
-		char buffer[1000];
 		number_of_bytes_received = recv( internet_socket, buffer, ( sizeof buffer ) - 1, 0 );
 		if( number_of_bytes_received == -1 )
 		{
@@ -191,6 +191,30 @@ void execution( int internet_socket )
 			buffer[number_of_bytes_received] = '\0';
 			printf( "Received answer %d: %s\n", i, buffer );
 		}
+	}
+
+	//send "STOP"
+	number_of_bytes_send = send( internet_socket, "STOP", 16, 0 );
+	if( number_of_bytes_send == -1 )
+	{
+		perror( "send" );
+	}
+	//receive "OK"
+	number_of_bytes_received = recv( internet_socket, buffer, ( sizeof buffer ) - 1, 0 );
+	if( number_of_bytes_received == -1 )
+	{
+		perror( "recv" );
+	}
+	else
+	{
+		buffer[number_of_bytes_received] = '\0';
+		printf( "\n\nConnection stop: %s\n\n", buffer );
+	}
+	//send "KTNXBYE"
+	number_of_bytes_send = send( internet_socket, "KTNXBYE", 16, 0 );
+	if( number_of_bytes_send == -1 )
+	{
+		perror( "send" );
 	}
 }
 
