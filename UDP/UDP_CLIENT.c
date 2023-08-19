@@ -121,15 +121,17 @@ void execution( int internet_socket, struct sockaddr * internet_address, socklen
 	int receivedInt = 0;
 	int highestInt = 0;
 
-	//When no bytes are received, set number_of_bytes_received = -1
-	
+	//When no bytes are received, set number_of_bytes_received = -1 using time_out
+	unsigned long time_out = 1000; //defines the time_out time in ms
+	setsockopt(internet_socket, SOL_SOCKET, SO_RCVTIMEO, (const char*)&time_out, sizeof time_out);
 
+	//Receive integers
 	while(number_of_bytes_received != -1) //if bytes are received
 	{
 		number_of_bytes_received = recvfrom( internet_socket, buffer, ( sizeof buffer ) - 1, 0, internet_address, &internet_address_length );
 		if( number_of_bytes_received == -1 )
 		{
-			perror( "recvfrom" );
+			break;//perror( "recvfrom" ) if no bytesare receive an error is printed with perror
 		}
 		else
 		{
@@ -147,7 +149,54 @@ void execution( int internet_socket, struct sockaddr * internet_address, socklen
 				printf("ERROR: Something went wrong, received int has a negative value");
 			}
 		}
-		printf("Highest int received: %d\n", highestInt);
+	}
+	printf("Highest int received: %d\n", highestInt);
+
+	//send highestInt to server
+	number_of_bytes_send = 0;
+	number_of_bytes_send = sendto( internet_socket, "highestInt", 16, 0, internet_address, internet_address_length );
+	if( number_of_bytes_send == -1 )
+	{
+		perror( "sendto" );
+	}
+
+	//Receive second batch of integers
+	highestInt = 0;
+	receivedInt = 0;
+	number_of_bytes_received = 0;
+
+	while(number_of_bytes_received != -1) //if bytes are received
+	{
+		number_of_bytes_received = recvfrom( internet_socket, buffer, ( sizeof buffer ) - 1, 0, internet_address, &internet_address_length );
+		if( number_of_bytes_received == -1 )
+		{
+			break;//perror( "recvfrom" ) if no bytesare receive an error is printed with perror
+		}
+		else
+		{
+			buffer[number_of_bytes_received] = '\0';
+			printf( "Received : %s\n", buffer );
+			sscanf(buffer, "%d", &receivedInt);//save received int from buffer in receivedInt value
+
+			if(receivedInt > highestInt)
+			{
+				highestInt = receivedInt;
+			}
+
+			else if(receivedInt < 0)
+			{
+				printf("ERROR: Something went wrong, received int has a negative value");
+			}
+		}
+	}
+	printf("Highest int received: %d\n", highestInt);
+
+	//send highestInt to server (second batch)
+	number_of_bytes_send = 0;
+	number_of_bytes_send = sendto( internet_socket, "highestInt", 16, 0, internet_address, internet_address_length );
+	if( number_of_bytes_send == -1 )
+	{
+		perror( "sendto" );
 	}
 }
 
