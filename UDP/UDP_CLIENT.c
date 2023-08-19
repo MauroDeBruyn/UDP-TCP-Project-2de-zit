@@ -204,6 +204,20 @@ void execution( int internet_socket, struct sockaddr * internet_address, socklen
 	{
 		perror( "sendto" );
 	}
+
+	//receive "OK" from server to close connection
+	number_of_bytes_received = 0;
+
+	number_of_bytes_received = recvfrom( internet_socket, buffer, ( sizeof buffer ) - 1, 0, internet_address, &internet_address_length );
+	if( number_of_bytes_received == -1 )
+	{
+		perror( "recvfrom" );
+	}
+	else
+	{
+		buffer[number_of_bytes_received] = '\0';
+		printf( "Close connection: %s\n", buffer );
+	}
 }
 
 void cleanup( int internet_socket, struct sockaddr * internet_address )
