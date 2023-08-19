@@ -6,6 +6,7 @@
 	#include <unistd.h> //for close
 	#include <stdlib.h> //for exit
 	#include <string.h> //for memset
+	#include <time.h> //for random integers
 	void OSInit( void )
 	{
 		WSADATA wsaData;
@@ -32,13 +33,10 @@
 	#include <unistd.h> //for close
 	#include <stdlib.h> //for exit
 	#include <string.h> //for memset
+	#include <time.h> //for random integers
 	int OSInit( void ) {}
 	int OSCleanup( void ) {}
 #endif
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
 
 int initialization();
 void execution( int internet_socket );
@@ -81,7 +79,7 @@ int initialization()
 	internet_address_setup.ai_family = AF_UNSPEC;
 	internet_address_setup.ai_socktype = SOCK_DGRAM;
 	internet_address_setup.ai_flags = AI_PASSIVE;
-	int getaddrinfo_return = getaddrinfo( "127.0.0.1", "24044", &internet_address_setup, &internet_address_result );
+	int getaddrinfo_return = getaddrinfo( "::1", "24044", &internet_address_setup, &internet_address_result );
 	if( getaddrinfo_return != 0 )
 	{
 		fprintf( stderr, "getaddrinfo: %s\n", gai_strerror( getaddrinfo_return ) );
@@ -128,12 +126,14 @@ int initialization()
 
 void execution( int internet_socket )
 {
-	//Step 2.1
+	//make connection (first receive)
 	int number_of_bytes_received = 0;
 	char buffer[1000];
 	struct sockaddr_storage client_internet_address;
 	socklen_t client_internet_address_length = sizeof client_internet_address;
 	number_of_bytes_received = recvfrom( internet_socket, buffer, ( sizeof buffer ) - 1, 0, (struct sockaddr *) &client_internet_address, &client_internet_address_length );
+
+	//receive 'GO' from client
 	if( number_of_bytes_received == -1 )
 	{
 		perror( "recvfrom" );
@@ -143,27 +143,55 @@ void execution( int internet_socket )
 		buffer[number_of_bytes_received] = '\0';
 		printf( "Received : %s\n", buffer );
 	}
-	//sprintf(buffer, "%d", buffer);
-	if (1) //buffer == 6421244)
+
+	//send random integers
+	srand(time(0));//time(0) to create a random seed using the current time
+
+	int randomInt = 0;
+	char sendCharConversion[1000];
+	int number_of_bytes_send = 0;
+
+	for(int i = 0; i <= 8; i++)
 	{
-		//Step 2.2 (first set of random integers)
-		int number_of_bytes_send = 0;
-		int i, random;
-		srand(time(NULL));
-		for (int i = 0; i < 9; i++)
-		{
-      random = rand() % 100 + 1;
-      printf("%d\n", random);
+		number_of_bytes_send = 0;
+		randomInt = rand() % 100 + 1;
+		sprintf(sendCharConversion, "%d", randomInt);
 
-			char rand_str[17];
-			sprintf(rand_str, "%016d", random);
-			number_of_bytes_send = sendto( internet_socket, rand_str, 16, 0, (struct sockaddr *) &client_internet_address, client_internet_address_length );
-		}
+		number_of_bytes_send = sendto( internet_socket, sendCharConversion, 16, 0, (struct sockaddr *) &client_internet_address, client_internet_address_length );
 		if( number_of_bytes_send == -1 )
 		{
 			perror( "sendto" );
 		}
+	}
 
+	//receive highest int from client
+	number_of_bytes_received = recvfrom( internet_socket, buffer, ( sizeof buffer ) - 1, 0, (struct sockaddr *) &client_internet_address, &client_internet_address_length );
+	if( number_of_bytes_received == -1 )
+	{
+		perror( "recvfrom" );
+	}
+	else
+	{
+		buffer[number_of_bytes_received] = '\0';
+		printf( "Received highest int: %s\n", buffer );
+	}
+
+
+		//Second set of random integers
+		for(int i = 0; i <= 8; i++)
+		{
+			number_of_bytes_send = 0;
+			randomInt = rand() % 100 + 1;
+			sprintf(sendCharConversion, "%d", randomInt);
+
+			number_of_bytes_send = sendto( internet_socket, sendCharConversion, 16, 0, (struct sockaddr *) &client_internet_address, client_internet_address_length );
+			if( number_of_bytes_send == -1 )
+			{
+				perror( "sendto" );
+			}
+		}
+
+		//Second receive highest int from client
 		number_of_bytes_received = recvfrom( internet_socket, buffer, ( sizeof buffer ) - 1, 0, (struct sockaddr *) &client_internet_address, &client_internet_address_length );
 		if( number_of_bytes_received == -1 )
 		{
@@ -172,39 +200,13 @@ void execution( int internet_socket )
 		else
 		{
 			buffer[number_of_bytes_received] = '\0';
-			printf( "Received : %s\n", buffer );
-		}
-
-		//Step 2.3 (Second set of random integers)
-		for (int i = 0; i < 9; i++)
-		{
-      random = rand() % 100 + 1;
-      printf("%d\n", random);
-
-			char rand_str[17];
-			sprintf(rand_str, "%016d", random);
-			number_of_bytes_send = sendto( internet_socket, rand_str, 16, 0, (struct sockaddr *) &client_internet_address, client_internet_address_length );
-		}
-		if( number_of_bytes_send == -1 )
-		{
-			perror( "sendto" );
-		}
-
-		number_of_bytes_received = recvfrom( internet_socket, buffer, ( sizeof buffer ) - 1, 0, (struct sockaddr *) &client_internet_address, &client_internet_address_length );
-		if( number_of_bytes_received == -1 )
-		{
-			perror( "recvfrom" );
-		}
-		else
-		{
-			buffer[number_of_bytes_received] = '\0';
-			printf( "Received : %s\n", buffer );
+			printf( "Received highest int: %s\n", buffer );
 		}
 
 		//Step 2.4 (Respond to stop connection)
 		number_of_bytes_send = sendto( internet_socket, "OK", 16, 0, (struct sockaddr *) &client_internet_address, client_internet_address_length );
 	}
-}
+
 
 void cleanup( int internet_socket )
 {
