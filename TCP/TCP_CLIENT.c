@@ -132,58 +132,63 @@ void execution( int internet_socket )
 	int convertOperation = 0;
 	char sendOperation[1000];
 	srand(time(0));
-
-	//generate random int's
-	number1 = (rand() % 99) + 1;
-	number2 = (rand() % 99) + 1;
-	convertOperation = (rand() % 4) + 1;
-
-	//assign a number to each operator
-	switch(convertOperation)
-	{
-		case 1:
-			operator = '-';
-				break;
-
-		case 2:
-			operator = '+';
-				break;
-
-		case 3:
-			operator = '*';
-				break;
-
-		case 4:
-			operator = '/';
-				break;
-
-		default:
-			printf("Invalid operator\n");
-	}
-
-
-	sprintf(sendOperation, "%d %c %d", number1, operator, number2); //combine different elements to 1 operation
-
-	//send operation
 	int number_of_bytes_send = 0;
-	number_of_bytes_send = send( internet_socket, sendOperation, 16, 0 );
-	if( number_of_bytes_send == -1 )
-	{
-		perror( "send" );
-	}
-
-	//receive answer
 	int number_of_bytes_received = 0;
-	char buffer[1000];
-	number_of_bytes_received = recv( internet_socket, buffer, ( sizeof buffer ) - 1, 0 );
-	if( number_of_bytes_received == -1 )
+
+	for(int i = 1; i < 5; i++)
 	{
-		perror( "recv" );
-	}
-	else
-	{
-		buffer[number_of_bytes_received] = '\0';
-		printf( "Received : %s\n", buffer );
+		//generate random int's
+		number1 = (rand() % 99) + 1;
+		number2 = (rand() % 99) + 1;
+		convertOperation = (rand() % 4) + 1;
+		number_of_bytes_send = 0;
+		number_of_bytes_received = 0;
+
+		//assign a number to each operator
+		switch(convertOperation)
+		{
+			case 1:
+				operator = '-';
+					break;
+
+			case 2:
+				operator = '+';
+					break;
+
+			case 3:
+				operator = '*';
+					break;
+
+			case 4:
+				operator = '/';
+					break;
+
+			default:
+				printf("Invalid operator\n");
+		}
+
+
+		sprintf(sendOperation, "%d %c %d", number1, operator, number2); //combine different elements to 1 operation
+
+		//send operation
+		number_of_bytes_send = send( internet_socket, sendOperation, 16, 0 );
+		if( number_of_bytes_send == -1 )
+		{
+			perror( "send" );
+		}
+
+		//receive answer
+		char buffer[1000];
+		number_of_bytes_received = recv( internet_socket, buffer, ( sizeof buffer ) - 1, 0 );
+		if( number_of_bytes_received == -1 )
+		{
+			perror( "recv" );
+		}
+		else
+		{
+			buffer[number_of_bytes_received] = '\0';
+			printf( "Received answer %d: %s\n", i, buffer );
+		}
 	}
 }
 

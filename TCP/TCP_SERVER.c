@@ -161,53 +161,57 @@ void execution( int internet_socket )
 	char operator;
 	int result = 0;
 	char sendResult[1000];
-
-
-	//receive operation
 	int number_of_bytes_received = 0;
 	char buffer[1000];
-	number_of_bytes_received = recv( internet_socket, buffer, ( sizeof buffer ) - 1, 0 );
-	if( number_of_bytes_received == -1 )
-	{
-		perror( "recv" );
-	}
-	else
-	{
-		buffer[number_of_bytes_received] = '\0';
-		printf( "Received operation : %s\n", buffer );
-	}
-
-	sscanf(buffer, "%d %c %d", &number1, &operator, &number2); //save received data
-
-	switch (operator)
-	{
-		case '-':
-			result = number1 - number2;
-				break;
-
-		case '+':
-			result = number1 + number2;
-				break;
-
-		case '*':
-			result = number1 * number2;
-				break;
-
-		case '/':
-			result = number1 / number2;
-				break;
-
-		default:
-			printf("Invalid operator\n");
-	}
-
-	sprintf(sendResult, "%d", result); //convert result to send
-
 	int number_of_bytes_send = 0;
-	number_of_bytes_send = send( internet_socket, sendResult, 16, 0 );
-	if( number_of_bytes_send == -1 )
+
+	for(int i = 1; i < 5; i++)
 	{
-		perror( "send" );
+		//receive operation
+		number_of_bytes_received = 0;
+		number_of_bytes_received = recv( internet_socket, buffer, ( sizeof buffer ) - 1, 0 );
+		if( number_of_bytes_received == -1 )
+		{
+			perror( "recv" );
+		}
+		else
+		{
+			buffer[number_of_bytes_received] = '\0';
+			printf( "Received operation %d: %s\n", i, buffer );
+		}
+
+		sscanf(buffer, "%d %c %d", &number1, &operator, &number2); //save received data
+
+		switch (operator)
+		{
+			case '-':
+				result = number1 - number2;
+					break;
+
+			case '+':
+				result = number1 + number2;
+					break;
+
+			case '*':
+				result = number1 * number2;
+					break;
+
+			case '/':
+				result = number1 / number2;
+					break;
+
+			default:
+				printf("Invalid operator\n");
+		}
+
+		sprintf(sendResult, "%d", result); //convert result to send
+
+		number_of_bytes_send = 0;
+		number_of_bytes_send = send( internet_socket, sendResult, 16, 0 );
+		if( number_of_bytes_send == -1 )
+		{
+			perror( "send" );
+		}
 	}
 }
 
